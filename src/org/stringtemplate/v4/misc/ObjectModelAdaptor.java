@@ -133,14 +133,24 @@ public class ObjectModelAdaptor<T> implements ModelAdaptor<T> {
 
     protected static Method tryGetMethod(Class<?> clazz, String methodName) {
         try {
+            //When iterating the entrySet() of a map, the set will contain not Map.Entry
+            //elements but java.util.KeyValueHolder elements which is an internal object
+            //not for public use. With the introduction of the modules it is rather hard
+            //to get the getKey()/getValue() methods of this internal object. But... we
+            //can get the getKey()/getValue() methods of the Map.Entry class!
+            //So if Map.Entry is a superclass of the clazz which is most probably an
+            //internal KeyValueHolder, then lets deal with it as if it si a Map.Entry.
+            if (Map.Entry.class.isAssignableFrom(clazz)) {
+                clazz = Map.Entry.class;
+            }
             Method method = clazz.getMethod(methodName);
-            if (method != null) {
+            boolean isPublic = method.getModifiers() == java.lang.reflect.Modifier.PUBLIC;
+            if (method != null && !isPublic) {
                 method.setAccessible(true);
             }
 
             return method;
-        } catch (Exception ex) {
-        }
+        } catch (Exception ex) {}
 
         return null;
     }
