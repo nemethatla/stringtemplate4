@@ -194,8 +194,7 @@ public abstract class BaseTest {
                 File file = new File(workingDirName, inputFileName);
                 addJarFile(file, workingDir, stream);
             }
-        }
-        finally {
+        } finally {
             stream.close();
         }
     }
@@ -239,36 +238,31 @@ public abstract class BaseTest {
             }
 
             stream.closeEntry();
-        }
-        finally {
+        } finally {
             input.close();
         }
     }
 
     protected void compile(String fileName, String workingDirName) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         files.add(new File(workingDirName, fileName));
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
-        StandardJavaFileManager fileManager =
-            compiler.getStandardFileManager(null, null, null);
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
 
-        Iterable<? extends JavaFileObject> compilationUnits =
-            fileManager.getJavaFileObjectsFromFiles(files);
+        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(files);
 
-        Iterable<String> compileOptions =
-            Arrays.asList("-g", "-source", "1.6", "-target", "1.6", "-implicit:class", "-Xlint:-options", "-d", workingDirName, "-cp", workingDirName+pathSep+CLASSPATH);
+        Iterable<String> compileOptions = Arrays.asList("-g", "-source", "17", "-target", "17", "-implicit:class", "-Xlint:-options", "-d",
+                workingDirName, "-cp", workingDirName + pathSep + CLASSPATH);
 
-        JavaCompiler.CompilationTask task =
-            compiler.getTask(null, fileManager, null, compileOptions, null,
-                             compilationUnits);
+        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, compileOptions, null,
+                compilationUnits);
         boolean ok = task.call();
 
         try {
             fileManager.close();
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             ioe.printStackTrace(System.err);
         }
 
